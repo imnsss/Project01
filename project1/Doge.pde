@@ -3,10 +3,10 @@ class Doge {
   PImage imgCurrent, img1, img2, img3, img4, img5, img6, img7, img8, img9;
   PVector position, target;
   
-  boolean moving = false;
-  int movingMarktime = 0;
-  int movingTimeout = 4000;
-  float movingSpread = 4;
+  boolean normal = false;
+  int normalMarktime = 0;
+  int normalTimeout = 4000;
+  float normalSpread = 4;
   
   
   boolean expressionChanges = false;
@@ -23,11 +23,10 @@ class Doge {
   int water;
   float margin = 40;
 
-  float count = 100;
+  float count = 0;
+  float count2 = 0;
   boolean Hungry = false;
   boolean Thirsty = false;
-  
-  int foodChoice;
 
   Doge(float x, float y){
     position = new PVector(x, y);
@@ -41,7 +40,7 @@ class Doge {
     img3.resize(img3.width/2, img3.height/2);
     img4 = loadImage("4.png"); // happy expression2
     img4.resize(img4.width/2, img4.height/2);
-    img6 = loadImage("6.png"); // moving expression
+    img6 = loadImage("6.png"); // normal expression
     img6.resize(img6.width/2, img6.height/2);
     img7 = loadImage("7.png"); // eating
     img7.resize(img7.width/2, img7.height/2);
@@ -49,27 +48,27 @@ class Doge {
     img8.resize(img8.width/2, img8.height/2);
     img9 = loadImage("9.png"); // star
     img9.resize(img9.width/2, img9.height/2);
-    
-
-    
+   
     imgCurrent = img1;
   }
 
   void update() {
     
     int t = millis();
-    
+    println(t);
     PVector mousePos = new PVector(mouseX, mouseY);
-    moving = position.dist(mousePos) > triggerDistance1;
+    normal = position.dist(mousePos) > triggerDistance1;
     
-    if (moving) {
+    if (normal) {
       Hungry = false;
+      Thirsty = false;
       imgCurrent = img6;
-      movingTarget();  
+      movingFoodTarget();  
+      movingDrinkTarget();
     }
 
-    else if (!moving && t > movingMarktime + movingTimeout) {  //EXPRESSION
-        if (!moving && t > changeMarktime + changeTimeout) { 
+    else if (!normal && t > normalMarktime + normalTimeout) {  //EXPRESSION
+        if (!normal && t > changeMarktime + changeTimeout) { 
           expressionChanges = true;
           changeMarktime = t;
         } 
@@ -84,53 +83,54 @@ class Doge {
         }
     }  
     
-    else if(!moving && t > 3000 ) {  
-      imgCurrent = img1; // back to normal
-      Hungry = false;
-    }
-    
-    if(moving && mouseButton == LEFT) {
+    if(normal && mouseButton == LEFT) {
       
-        if(count <= 90){
+      count ++;
+      
+        if(count > 10){
           Hungry = true;
-          count += 1;
+          if (count == 25){
+          count = 0;
+          }
         }else{
           Hungry = false;
         }
-        count--;
     }
     
-    if (moving||Hungry){
+    if (normal||Hungry){
     position = position.lerp(target, movementSpeed); 
-  } 
+    } 
   
     if(Hungry && position.dist(target) < 7){
      foods[food].exist = false;
        FoodTarget();
     }
     
-       if(moving && mouseButton == RIGHT) {
+    if(normal && mouseButton == RIGHT) {
       
-        if(count <= 90){
+        count2 ++;
+      
+        if(count2 > 5){
           Thirsty = true;
-          count += 1;
+          if (count2 == 15){
+          count2 = 0;
+          }
         }else{
           Thirsty = false;
         }
-        count--;
     }
-    
-    if (moving||Thirsty){
-    position = position.lerp(target, movementSpeed); 
-  } 
+        
+    if (normal||Thirsty){
+      position = position.lerp(target, movementSpeed); 
+    } 
   
-    if(Thirsty && position.dist(target) <6){
-     waters[water].exist = false;
+    if(Thirsty && position.dist(target) < 5){
+       waters[water].exist = false;
        DrinkTarget();
     }
     
     if(mouseButton == CENTER) {
-      target = new PVector(random(margin, width-margin+50), random(margin, height-margin+50));
+      target = new PVector(random(margin, width-margin+55), random(margin, height-margin+50));
       imgCurrent = img1;
       image(img9, random(margin, width-margin+30), random(margin, height-margin+30));
     }
@@ -138,7 +138,7 @@ class Doge {
   }
        
        
-  void movingTarget() {
+  void movingFoodTarget() {
     if(mousePressed == true && mouseButton == LEFT){
       target = new PVector(mouseX, mouseY);
     } 
@@ -152,6 +152,12 @@ class Doge {
           imgCurrent = img7;
           foods[food].exist = true;
   }  
+  
+   void movingDrinkTarget() {
+    if(mousePressed == true && mouseButton == RIGHT){
+      target = new PVector(mouseX, mouseY);
+    } 
+  }
   
   void DrinkTarget() {
       water = int(random(waters.length));
@@ -183,5 +189,4 @@ class Doge {
      draw();
   }
    
- 
 }

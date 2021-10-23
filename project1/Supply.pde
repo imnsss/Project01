@@ -3,16 +3,10 @@ class Food {
   PImage Food;
   boolean exist = true;
   
-  
-
   Food(float mouseX, float mouseY) {
     position = new PVector(mouseX, mouseY);
     Food = loadImage("food.png");
     Food.resize(Food.width/4, Food.height/4);
-  }
-  
-  void update() {
-  
   }
   
   void draw(){
@@ -21,12 +15,9 @@ class Food {
       image(Food, mouseX, mouseY);
       imageMode(CENTER);
     }
-    return ;
-  
   }
   
   void run(){
-    update();
     draw();
   }
 
@@ -38,28 +29,20 @@ class Water {
   PImage Water;
   boolean exist = true;
   
-  
-
   Water(float mouseX, float mouseY) {
     position = new PVector(mouseX, mouseY);
     Water = loadImage("water.png");
     Water.resize(Water.width/7, Water.height/7);
   }
-  
-  void update() {
-  
-  }
-  
+   
   void draw(){
     if (exist && mouseButton == RIGHT){
       image(Water, mouseX, mouseY);
       imageMode(CENTER);
-    }
-  
+    } 
   }
   
   void run(){
-    update();
     draw();
   }
 
@@ -68,20 +51,39 @@ class Water {
 
 class Bone {
   
+  float gravity = 0.35;
+float gravityDelta = 0.005;
+float friction = 0.87;
+  
   PVector position;
   PImage bone;
-  boolean alive = true;
+  PVector speed;
+  int timestamp;
+  boolean alive = true;;
+  ArrayList<Bone> bones;
+
   
   Bone(float x, float y) {
     position = new PVector(x, y);
     bone = loadImage("bone.png");
     bone.resize(bone.width/3, bone.height/3);
-
+    timestamp = millis();
+    speed = new PVector(random(-1, 1), random(-1, 2));
+    bones = new ArrayList<Bone>();
   }
   
   void update() {
-    // TODO
+    position.add(speed);
+    position.y += gravity;
+    speed.mult(friction);
+    position.y = constrain(position.y, 0, height);
+    
+        if(position.y >= 600 || position.y <= 100) {
+        gravityDelta *= -1;
+        }
+    
   }
+  
   
   void draw() {
     if (alive) {
